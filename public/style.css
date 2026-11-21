@@ -298,3 +298,16 @@ h1{font-size:clamp(36px,4.3vw,56px);line-height:1.12}
 @media (max-width:560px){.row2,.coin-grid,.stats-grid{grid-template-columns:1fr}.c-head{flex-direction:column;align-items:flex-start}#wallet{display:inline-flex}}
 @media (max-width:960px){body[data-page] .nav{display:flex;gap:14px}body[data-page] .nav a[href^="/#"]{display:none}}
 @media (max-width:420px){body[data-page] #x-link{display:none}}
+
+/* wallet picker */
+.wmodal{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.6);display:grid;place-items:center;padding:20px;backdrop-filter:blur(4px)}
+.wbox{width:100%;max-width:380px;background:var(--panel);border:1px solid var(--line-2);border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:8px}
+.whead{display:flex;justify-content:space-between;align-items:center;padding:2px 4px 8px}
+.whead b{font:600 15px var(--mono)}
+.wx{background:none;border:0;color:var(--muted);font-size:22px;cursor:pointer;line-height:1}
+.wopt{display:flex;align-items:center;gap:12px;width:100%;padding:12px;border:1px solid var(--line-2);border-radius:12px;background:var(--bg);color:var(--text);font:500 15px var(--sans);text-align:left;cursor:pointer;text-decoration:none}
+.wopt:hover{border-color:var(--v-3);background:var(--v-soft)}
+.wopt img,.wopt .wic{width:32px;height:32px;border-radius:8px;flex:none}
+.wopt .wic{display:grid;place-items:center;background:var(--panel-2);font:600 14px var(--mono);color:var(--v)}
+.wopt small{display:block;font:400 12px var(--mono);color:var(--faint);margin-top:2px}
+.wopt.dim{opacity:.7}

@@ -27,10 +27,28 @@ document.addEventListener("click", (e) => {
 
 /* ── wallet button (sub pages) ── */
 const wbtn = $("#wallet");
+// wallet picker: lists every wallet the browser announces (MetaMask, Phantom, Rabby…)
+function pickWallet(list) {
+  return new Promise((resolve) => {
+    const m = document.createElement("div");
+    m.className = "wmodal";
+    const has = (n) => list.some(w => new RegExp(n, "i").test(w.name));
+    const extra = has("phantom") ? "" : `<a class="wopt dim" href="https://phantom.com/download" target="_blank" rel="noopener"><span class="wic">P</span><span>Phantom<small>not detected: install it, or unlock it and refresh</small></span></a>`;
+    m.innerHTML = `<div class="wbox" role="dialog" aria-label="Connect a wallet"><div class="whead"><b>Connect a wallet</b><button class="wx" aria-label="Close">×</button></div>
+      ${list.map((w, i) => `<button class="wopt" data-i="${i}">${w.icon ? `<img src="${w.icon}" alt="">` : `<span class="wic">${esc(w.name[0])}</span>`}<span>${esc(w.name)}<small>Robinhood Chain</small></span></button>`).join("") || `<p class="note-s">No wallet found in this browser.</p>`}${extra}</div>`;
+    const close = (v) => { m.remove(); resolve(v); };
+    m.addEventListener("click", (e) => { const b = e.target.closest("[data-i]"); if (b) close(list[+b.dataset.i]); else if (e.target === m || e.target.closest(".wx")) close(null); });
+    document.body.appendChild(m);
+  });
+}
 async function ensureWallet() {
   const m = await w3();
   if (m.account()) return m.account();
-  try { const a = await m.connect(); return a; } catch (e) { toast(m.errorText(e)); return null; }
+  await new Promise(r => setTimeout(r, 150)); // let wallets announce themselves
+  const list = m.wallets().sort((a, b) => (/phantom/i.test(b.name) ? 1 : 0) - (/phantom/i.test(a.name) ? 1 : 0));
+  const w = await pickWallet(list);
+  if (!w) return null;
+  try { return await m.connect(w.provider); } catch (e) { toast(m.errorText(e)); return null; }
 }
 if (wbtn) {
   const paint = (a) => { wbtn.textContent = a ? short(a) : "Connect"; };

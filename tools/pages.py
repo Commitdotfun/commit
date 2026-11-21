@@ -15,7 +15,7 @@ HEAD = """<!doctype html>
 <meta property="og:image" content="https://commitdot.fun/og.png">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://commitdot.fun/og.png">
-<link rel="stylesheet" href="/style.css?v=4">
+<link rel="stylesheet" href="/style.css?v=6">
 </head>
 <body data-page="{page}">
 <header class="top">
@@ -48,7 +48,7 @@ FOOT = """
 </footer>
 <div class="toast" id="toast" role="status"></div>
 <script src="/config.js?v=5"></script>
-<script type="module" src="/assets/pages.js?v=2"></script>
+<script type="module" src="/assets/pages.js?v=3"></script>
 </body>
 </html>
 """

@@ -23,6 +23,7 @@ if (typeof window !== "undefined") {
 }
 export function wallets() {
   const list = [...announced.values()].map(d => ({ id: d.info.uuid, name: d.info.name, icon: d.info.icon, provider: d.provider }));
+  if (!list.some(w => /phantom/i.test(w.name)) && window.phantom?.ethereum) list.push({ id: "phantom", name: "Phantom", icon: "", provider: window.phantom.ethereum });
   if (!list.length && window.ethereum) list.push({ id: "injected", name: window.ethereum.isPhantom ? "Phantom" : window.ethereum.isRabby ? "Rabby" : window.ethereum.isMetaMask ? "MetaMask" : "Browser wallet", icon: "", provider: window.ethereum });
   return list;
 }
