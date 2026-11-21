@@ -103,17 +103,26 @@ else {
     }
     git(["add", "-A"]);
     const changed = (git(["status", "--porcelain"]).stdout || "").trim();
-    if (!changed) say("   ✓ rien de nouveau depuis le dernier envoi (pas de commit)");
-    else {
-      const MSGF = join(root, ".commit-msg");
-      let msg = existsSync(MSGF) ? readFileSync(MSGF, "utf8").trim() : "";
+    const MSGF = join(root, ".commit-msg");
+    let msg = "";
+    if (changed) {
+      msg = existsSync(MSGF) ? readFileSync(MSGF, "utf8").trim() : "";
       if (!msg) msg = (await ask("   Message du commit (Entrée = « update site ») : ")) || "update site";
-      const c = git(["commit", "-q", "-m", msg]);
-      const p = git(["push", "-q", url, "HEAD:main"]);
-      const out = ((p.stdout || "") + (p.stderr || "")).replaceAll(tok, "…");
-      appendFileSync(LOG, out + "\n");
-      if (c.status === 0 && p.status === 0) { say(`   ✓ commit publié : « ${msg} » → rachat + burn au prochain passage du keeper`); try { writeFileSync(MSGF, ""); } catch {} }
-      else say("   ⚠️  envoi sur GitHub échoué : " + out.split("\n").filter(Boolean).slice(-2).join(" "));
+      git(["commit", "-q", "-m", msg]);
+    }
+    // push every local commit not on GitHub yet (also the ones a failed run left behind)
+    const p = git(["push", url, "HEAD:main"]);
+    const out = ((p.stdout || "") + (p.stderr || "")).replaceAll(tok, "…");
+    appendFileSync(LOG, out + "\n");
+    if (p.status === 0) {
+      say(changed || /->/.test(out) ? `   ✓ code publié sur GitHub${msg ? " : « " + msg + " »" : ""} → rachat + burn au prochain passage du keeper` : "   ✓ rien de nouveau depuis le dernier envoi (pas de commit)");
+      try { writeFileSync(MSGF, ""); } catch {}
+    } else {
+      say("   ⚠️  envoi sur GitHub refusé : " + out.split("\n").filter(Boolean).slice(-2).join(" "));
+      if (/403|denied|Authentication failed|401/i.test(out)) {
+        writeFileSync(TOKF, "");
+        say("   Le token n'a pas le droit d'écrire sur commitdotfun/commit (Contents: Read and write). Il te sera redemandé au prochain lancement.");
+      }
     }
   }
 }
