@@ -1,0 +1,280 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Commit · Every commit is a buyback</title>
+<meta name="description" content="Launch a coin for any GitHub repo. Every push to its default branch buys the coin back and burns it. Coming soon on Robinhood Chain.">
+<meta name="theme-color" content="#08090b">
+<link rel="icon" type="image/png" href="/favicon.png?v=2">
+<link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+<meta property="og:title" content="Commit · Every commit is a buyback">
+<meta property="og:description" content="Launch a coin for any GitHub repo. Every push buys it back and burns it.">
+<meta property="og:image" content="https://commitdot.fun/og.png">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://commitdot.fun/og.png">
+<link rel="preload" href="/fonts/martian-mono-600.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="/style.css?v=5">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="top">
+  <div class="wrap top-in">
+    <a class="brand" href="#top" aria-label="Commit home">
+      <img src="/img/logo.png?v=2" alt="" width="30" height="30">
+      <span>commit</span>
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a href="#replay">Replay</a>
+      <a href="#how">How it works</a>
+      <a href="#rule">The rule</a>
+      <a href="#faq">FAQ</a>
+      <a href="/coins">Coins</a>
+    </nav>
+    <div class="top-right">
+      <button class="ca" id="ca" type="button" title="Contract address"><b id="ca-ticker">$COMMIT</b><span id="ca-text">soon</span></button>
+      <a class="icon-btn" id="x-link" href="#" target="_blank" rel="noopener" aria-label="Commit on X">
+        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M17.75 3h3.07l-6.7 7.66L22 21h-6.17l-4.83-6.32L5.47 21H2.4l7.17-8.2L2 3h6.33l4.37 5.78L17.75 3Zm-1.08 16.17h1.7L7.4 4.74H5.58l11.09 14.43Z"/></svg>
+      </a>
+      <a class="btn btn-soon" id="launch-btn" href="/launch">Launch <i>soon</i></a>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+<section class="hero" id="top">
+  <div class="wrap hero-in">
+    <div class="hero-copy">
+      <p class="kicker"><i class="dot"></i><span id="kicker">Coming soon on Robinhood Chain, powered by Pons</span></p>
+      <h1>Every commit<br>is a <em>buyback.</em></h1>
+      <p class="lead">Launch a coin for any GitHub repo. Every push to its default branch spends everything in the coin's vault buying it back, then burns what it bought. The chart moves when the code does.</p>
+      <div class="cta">
+        <a class="btn btn-main" href="#replay">Replay a repo</a>
+        <a class="btn btn-ghost" href="#how">How it works</a>
+      </div>
+      <dl class="mini">
+        <div><dt>trigger</dt><dd>git push</dd></div>
+        <div><dt>per commit</dt><dd><span data-cfg="PER_COMMIT"></span>% of vault</dd></div>
+        <div><dt>bought</dt><dd>burned</dd></div>
+      </dl>
+    </div>
+    <div class="hero-art">
+      <canvas id="sky" aria-label="3D skyline of commits, each column grows when a commit lands"></canvas>
+      <div class="sky-tag"><span id="sky-repo">torvalds/linux</span><b id="sky-last">waiting for a push</b></div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="live" hidden>
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>Live buybacks.</h2>
+      <p>Real commits, real buys, real burns. Every row is a transaction on Robinhood Chain.</p>
+    </div>
+    <div class="panel"><ol class="feed live-feed" id="live-feed"></ol></div>
+  </div>
+</section>
+
+<section class="band" id="replay">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>Replay any repo.</h2>
+      <p>Pick a public repo. We pull its real latest commits from GitHub and replay them as if its coin were live. Simulated numbers, real commits.</p>
+    </div>
+    <form class="repo-form" id="repo-form" autocomplete="off">
+      <label class="sr" for="repo-in">GitHub repo</label>
+      <span class="gh-prefix">github.com/</span>
+      <input id="repo-in" name="repo" spellcheck="false" placeholder="owner/repo" value="torvalds/linux">
+      <button class="btn btn-main" type="submit">Replay</button>
+    </form>
+    <div class="chips" id="chips">
+      <button type="button" data-repo="torvalds/linux">torvalds/linux</button>
+      <button type="button" data-repo="vercel/next.js">vercel/next.js</button>
+      <button type="button" data-repo="bitcoin/bitcoin">bitcoin/bitcoin</button>
+      <button type="button" data-repo="ethereum/go-ethereum">ethereum/go-ethereum</button>
+      <button type="button" data-repo="facebook/react">facebook/react</button>
+    </div>
+
+    <div class="replay">
+      <div class="panel feed-panel">
+        <div class="panel-top"><span class="ptitle">push feed</span><span class="pill" id="feed-state">loading</span></div>
+        <ol class="feed" id="feed" aria-live="polite"></ol>
+      </div>
+      <div class="panel sim-panel">
+        <div class="panel-top"><span class="ptitle">simulated coin</span><span class="pill pill-sim">demo</span></div>
+        <div class="sim-chart"><canvas id="chart" aria-label="Simulated price chart"></canvas></div>
+        <dl class="sim-stats">
+          <div><dt>commits</dt><dd id="s-commits">0</dd></div>
+          <div><dt>vault</dt><dd id="s-vault">0.0000 ETH</dd></div>
+          <div><dt>bought back</dt><dd id="s-bought">0.0000 ETH</dd></div>
+          <div><dt>burned</dt><dd id="s-burned">0</dd></div>
+        </dl>
+        <p class="note">Fees trickle into the vault between commits. Each commit spends all of it. Not live data.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="year">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>Every square is a buy.</h2>
+      <p id="year-cap">A year of commits for the replayed repo. On Commit, each one is a buyback.</p>
+    </div>
+    <div class="panel heat-panel">
+      <div class="heat" id="heat" role="img" aria-label="Commits per day, last 12 months"></div>
+      <div class="heat-foot">
+        <span id="heat-total">Counting commits…</span>
+        <span class="legend">Less <i class="l0"></i><i class="l1"></i><i class="l2"></i><i class="l3"></i><i class="l4"></i> More</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="how">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>How it works</h2>
+      <p>A coin names a repo. Its vault fills from trading fees. Each commit spends the whole vault on the coin, then burns it.</p>
+    </div>
+    <ol class="steps">
+      <li class="panel">
+        <span class="n">1</span>
+        <h3>Pick a repo</h3>
+        <p>Paste any public GitHub repo. The coin is tied to it for good: its default branch becomes the trigger.</p>
+      </li>
+      <li class="panel">
+        <span class="n">2</span>
+        <h3>Launch on Pons</h3>
+        <p>A standard Pons coin: bonding curve first, then a locked Uniswap v4 pool. Creator fees are split: <span data-cfg="FEE_VAULT"></span>% to the repo's buyback vault, <span data-cfg="FEE_TEAM"></span>% to Commit.</p>
+      </li>
+      <li class="panel">
+        <span class="n">3</span>
+        <h3>Code ships, chart moves</h3>
+        <p>Our keeper watches the branch. A new commit lands, <span data-cfg="PER_COMMIT"></span>% of the vault buys the coin on its pool and the tokens go to the dead address. Every buy is on the chart.</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section class="band" id="rule">
+  <div class="wrap rule-in">
+    <div class="rule-copy">
+      <h2>One rule, written down.</h2>
+      <p>No votes, no roadmap promises. The repo's commit history is the only input. If the code moves, the coin gets bought.</p>
+      <ul class="ticks">
+        <li>Only the default branch counts. Pushes to other branches do nothing.</li>
+        <li>A merge counts once. Force-pushed or rewritten commits never count.</li>
+        <li>A buy can only spend what the vault holds, so spamming commits never buys more than the fees that came in.</li>
+        <li>At most one buy every <span data-cfg="COOLDOWN_MIN"></span> minutes per coin. Commits in between are batched.</li>
+      </ul>
+    </div>
+    <div class="panel code">
+      <div class="code-top"><span>commit.rules</span><span class="muted">default branch</span></div>
+<pre><code><span class="c"># what happens on every push</span>
+trigger    = <span class="v">push to default branch</span>
+per_commit = <span class="v"><span data-cfg="PER_COMMIT"></span>% of vault</span>
+cooldown   = <span class="v"><span data-cfg="COOLDOWN_MIN"></span> min, then batch</span>
+buy_on     = <span class="v">the coin's Pons pool</span>
+send_to    = <span class="v">0x000000000000000000000000000000000000dEaD</span>
+<span class="c"># fees, every trade</span>
+vault      = <span class="v"><span data-cfg="FEE_VAULT"></span>%</span>
+commit     = <span class="v"><span data-cfg="FEE_TEAM"></span>%</span></code></pre>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="flow">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2>Where the money goes</h2>
+      <p>Fees only ever go two ways: into the repo's vault, or to Commit. The vault has one job: buy its own coin and burn it.</p>
+    </div>
+    <div class="flow">
+      <div class="node"><b>every trade</b><span>creator fee on Pons</span></div>
+      <div class="arrow" aria-hidden="true"></div>
+      <div class="split">
+        <div class="node node-accent"><b><span data-cfg="FEE_VAULT"></span>% repo vault</b><span>one per coin, waits for commits</span></div>
+        <div class="node"><b><span data-cfg="FEE_TEAM"></span>% Commit</b><span>runs the keeper, builds the pad</span></div>
+      </div>
+      <div class="arrow" aria-hidden="true"></div>
+      <div class="node node-accent"><b>git push</b><span><span data-cfg="PER_COMMIT"></span>% of the vault buys the coin</span></div>
+      <div class="arrow" aria-hidden="true"></div>
+      <div class="node"><b>0x…dEaD</b><span>bought tokens are burned</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="who">
+  <div class="wrap two">
+    <div class="panel side">
+      <p class="eyebrow">For launchers</p>
+      <h3>Back the code you believe in.</h3>
+      <ul class="ticks">
+        <li>Launch for any public repo in under a minute.</li>
+        <li>Pick your coin's name, ticker and image yourself.</li>
+        <li>Add a dev buy in the same transaction.</li>
+        <li>Pick a repo that actually ships. That's the whole game.</li>
+      </ul>
+    </div>
+    <div class="panel side">
+      <p class="eyebrow">For holders</p>
+      <h3>Watch the commits, not the hype.</h3>
+      <ul class="ticks">
+        <li>Every buyback links the commit that triggered it.</li>
+        <li>Burns are on-chain, sent to the dead address.</li>
+        <li>An active repo means steady buys. A dead repo means none.</li>
+        <li>The vault keeps filling as long as the coin trades.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="band" id="faq">
+  <div class="wrap faq-in">
+    <h2>Questions</h2>
+    <div class="faq">
+      <details><summary>Do the repo's maintainers have to do anything?</summary><p>No. Commit only reads public commit history. Maintainers don't sign up, hold anything or even know the coin exists. A coin doesn't mean they endorse it.</p></details>
+      <details><summary>What counts as a commit?</summary><p>A new commit that reaches the repo's default branch (usually main or master). A merged pull request counts once. Commits on other branches, and history that gets force-pushed away, don't count.</p></details>
+      <details><summary>What stops someone from spamming commits?</summary><p>A buy can only spend what's in the vault, and there's at most one buy every <span data-cfg="COOLDOWN_MIN"></span> minutes per coin. Commits in between are batched into the next buy, so a hundred empty commits buy exactly what one would.</p></details>
+      <details><summary>Where do the fees go?</summary><p><span data-cfg="FEE_VAULT"></span>% of each coin's creator fees fill its repo vault, which only buys back and burns that coin. <span data-cfg="FEE_TEAM"></span>% go to Commit.</p></details>
+      <details><summary>What if the repo goes quiet?</summary><p>No commits, no buys. The vault keeps what it has and spends it when the next commit lands.</p></details>
+      <details><summary>Which chain?</summary><p>Robinhood Chain. Coins launch through Pons, so they trade on Pons and on a locked Uniswap v4 pool after the curve.</p></details>
+      <details><summary>When does it open?</summary><p>Soon. Follow <a id="faq-x" href="#" target="_blank" rel="noopener">Commit on X</a> for the launch.</p></details>
+    </div>
+  </div>
+</section>
+
+<section class="end">
+  <div class="wrap end-in">
+    <h2>Ship code. <em>Burn supply.</em></h2>
+    <div class="cta">
+      <a class="btn btn-main" id="end-x" href="#" target="_blank" rel="noopener">Follow on X</a>
+      <a class="btn btn-ghost" href="#replay">Replay a repo</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap foot-in">
+    <a class="brand" href="#top"><img src="/img/logo.png?v=2" alt="" width="24" height="24"><span>commit</span></a>
+    <p>Every commit is a buyback. Built on Robinhood Chain with Pons.</p>
+    <div class="foot-links">
+      <a id="foot-x" href="#" target="_blank" rel="noopener">X</a>
+      <a id="foot-pons" href="#" target="_blank" rel="noopener">Pons</a>
+    </div>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status"></div>
+
+<script src="/config.js?v=5"></script>
+<script src="/app.js?v=5"></script>
+<script type="module" src="/assets/pages.js?v=2"></script>
+</body>
+</html>

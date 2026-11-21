@@ -1,0 +1,26 @@
+COMMIT — mise en route de la tech
+=================================
+
+Chaque coin a un vault (contrat). Les creator fees y arrivent : 80 % partent tout de suite sur ton wallet,
+20 % restent comme budget de rachat. A chaque commit sur la branche principale du repo, le keeper depense
+2 % du vault (1 rachat max toutes les 10 min, commits regroupes) pour racheter le coin et le burn.
+Si le coin a ete lance par le wallet keeper (0xBdAa…b1Fb), le rachat apparait comme un dev buy puis un dev burn.
+
+1. Double-clique « Deployer Commit.bat » (dans memecoin-projets)
+   - cree le stockage KV « commit-data » (gratuit)
+   - deploie le site sur commitdot.fun
+   - regle le RPC prive (copie depuis summon/.env)
+   - te demande la cle privee du wallet keeper/dev (une fois) et le token GitHub (une fois)
+
+2. Ouvre https://commitdot.fun/admin avec le wallet 0xBdAa…b1Fb, sur Robinhood Chain :
+   1 · Deploy swap router
+   2 · Deploy factory (tresorerie et keeper = 0xBdAa…b1Fb, ta part 80 %), puis Set router on factory
+   3 · Sign and save  → les lancements s'ouvrent sur /launch
+
+3. Lance COMMIT depuis https://commitdot.fun/launch avec le wallet 0xBdAa…b1Fb
+   repo : commitdotfun/commit
+
+4. Colle la CA dans public/config.js (CA: "0x…") puis relance « Deployer Commit.bat ».
+
+Le keeper tourne tout seul toutes les 5 minutes sur Cloudflare. Sur /admin : « Run the keeper now » pour un passage immediat,
+et l'etat du keeper (derniere passe, erreurs).

@@ -1,0 +1,13 @@
+node_modules/
+.wrangler/
+dist/
+build/mocks.json
+videos/
+*.zip
+deploy-log.txt
+.keeper-set
+.github-set
+.rpc-set
+.deploy-token
+.commit-msg
+.env

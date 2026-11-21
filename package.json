@@ -1,0 +1,5 @@
+{
+  "name": "commit",
+  "private": true,
+  "devDependencies": { "wrangler": "^4" }
+}

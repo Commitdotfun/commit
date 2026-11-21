@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin · Commit</title>
+<meta name="description" content="Launch a coin for any GitHub repo. Every push to its default branch buys the coin back and burns it.">
+<meta name="theme-color" content="#08090b">
+<link rel="icon" type="image/png" href="/favicon.png?v=2">
+<link rel="apple-touch-icon" href="/img/apple-touch-icon.png">
+<meta property="og:title" content="Admin · Commit">
+<meta property="og:image" content="https://commitdot.fun/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://commitdot.fun/og.png">
+<link rel="stylesheet" href="/style.css?v=4">
+</head>
+<body data-page="admin">
+<header class="top">
+  <div class="wrap top-in">
+    <a class="brand" href="/" aria-label="Commit home"><img src="/img/logo.png?v=2" alt="" width="30" height="30"><span>commit</span></a>
+    <nav class="nav" aria-label="Main">
+      <a href="/#how">How it works</a>
+      <a href="/#rule">The rule</a>
+      <a href="/coins">Coins</a>
+      <a href="/launch">Launch</a>
+    </nav>
+    <div class="top-right">
+      <a class="icon-btn" id="x-link" href="https://x.com/commitdotfun" target="_blank" rel="noopener" aria-label="Commit on X">
+        <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path fill="currentColor" d="M17.75 3h3.07l-6.7 7.66L22 21h-6.17l-4.83-6.32L5.47 21H2.4l7.17-8.2L2 3h6.33l4.37 5.78L17.75 3Zm-1.08 16.17h1.7L7.4 4.74H5.58l11.09 14.43Z"/></svg>
+      </a>
+      <button class="btn btn-ghost btn-sm" id="wallet" type="button">Connect</button>
+    </div>
+  </div>
+</header>
+<main id="main">
+
+<section class="phead"><div class="wrap">
+  <h1>Set up <em>Commit.</em></h1>
+  <p class="lead">Deploy the contracts from the admin wallet, then sign to save the addresses. Each step is one transaction.</p>
+</div></section>
+<section class="band band-tight"><div class="wrap admin">
+  <div class="panel kv" id="a-status"></div>
+  <div class="panel form"><p class="eyebrow">1 · Swap router</p><h3>Buys coins after they graduate</h3>
+    <div class="field"><label for="a-router">Router address</label><input id="a-router" placeholder="Filled after deployment"></div>
+    <button class="btn btn-main" id="a-deploy-router" type="button">Deploy swap router</button></div>
+  <div class="panel form"><p class="eyebrow">2 · Factory</p><h3>One vault per coin</h3>
+    <div class="row2"><div class="field"><label for="a-treasury">Treasury (your share)</label><input id="a-treasury"></div><div class="field"><label for="a-keeper">Keeper (buybacks)</label><input id="a-keeper"></div></div>
+    <div class="row2"><div class="field"><label for="a-bps">Your share of creator fees (%)</label><input id="a-bps" value="80"></div><div class="field"><label for="a-factory">Factory address</label><input id="a-factory" placeholder="Filled after deployment"></div></div>
+    <div class="btn-row"><button class="btn btn-main" id="a-deploy-factory" type="button">Deploy factory</button><button class="btn btn-ghost" id="a-set-router" type="button">Set router on factory</button></div></div>
+  <div class="panel form"><p class="eyebrow">3 · Save</p><h3>Publish the configuration</h3><p class="note-s">Signs a message (no transaction). The site and the keeper read these addresses.</p>
+    <div class="btn-row"><button class="btn btn-main" id="a-save" type="button">Sign and save</button><button class="btn btn-ghost" id="a-run" type="button">Run the keeper now</button></div></div>
+  <div class="panel"><div class="panel-top"><span class="ptitle">log</span></div><pre class="log" id="a-log"></pre></div>
+</div></section>
+
+</main>
+<footer class="foot">
+  <div class="wrap foot-in">
+    <a class="brand" href="/"><img src="/img/logo.png?v=2" alt="" width="24" height="24"><span>commit</span></a>
+    <p>Every commit is a buyback. Built on Robinhood Chain with Pons.</p>
+    <div class="foot-links"><a href="https://x.com/commitdotfun" target="_blank" rel="noopener">X</a><a href="https://ponsfamily.com/launchpad" target="_blank" rel="noopener">Pons</a></div>
+  </div>
+</footer>
+<div class="toast" id="toast" role="status"></div>
+<script src="/config.js?v=5"></script>
+<script type="module" src="/assets/pages.js?v=2"></script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+name = "commit"
+main = "dist/worker.js"
+compatibility_date = "2025-09-01"
+workers_dev = true
+routes = [ { pattern = "commitdot.fun", custom_domain = true } ]
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+html_handling = "auto-trailing-slash"
+not_found_handling = "single-page-application"
+run_worker_first = ["/api/*", "/i/*"]
+
+# Created automatically by tools/deploy.mjs (Deployer Commit.bat)
+[[kv_namespaces]]
+binding = "DATA"
+id = "ce504bc2b2954541bab2da5d0289b751"
+
+# Keeper: watches the repos, claims fees, buys back and burns (needs the KEEPER_KEY and GITHUB_TOKEN secrets)
+[triggers]
+crons = ["*/5 * * * *"]
+
+[vars]
+ADMIN_ADDRESS = "0xBdAab26FeC78C768F559b32348Dbc8EE24d7b1Fb"
