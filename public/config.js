@@ -1,7 +1,7 @@
 // Everything you may need to change lives here.
 // To go live: paste the token address in CA and redeploy. Leave it "" for "coming soon".
 window.COMMIT = {
-  CA: "",
+  CA: "0x13c9d20b1fe3696b855526614965a4ab474b886b",
   TICKER: "COMMIT",
   X_URL: "https://x.com/commitdotfun",
   PONS_URL: "https://ponsfamily.com/launchpad",

@@ -1,7 +1,7 @@
 // Commit keeper: watches each coin's GitHub repo; claims creator fees into the vault (80% straight to the treasury),
 // and when new commits land on the default branch, spends 30% of the vault per commit buying the coin and burns it.
 // Used by the Worker cron.
-import { createPublicClient, createWalletClient, http, defineChain, parseAbi, decodeEventLog } from "viem";
+import { createPublicClient, createWalletClient, http, fallback, defineChain, parseAbi, decodeEventLog } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { CHAIN, PONS, ESCROW_ABI, RULE } from "../chain.js";
 
@@ -41,9 +41,9 @@ const ZERO = "0x0000000000000000000000000000000000000000";
 
 export function clients(key, rpcUrl) {
   const account = privateKeyToAccount(key.startsWith("0x") ? key : "0x" + key);
-  const rpc = rpcUrl || CHAIN.rpc;
-  const pub = createPublicClient({ chain: robinhood, transport: http(rpc) });
-  const wallet = createWalletClient({ chain: robinhood, transport: http(rpc), account });
+  const transport = rpcUrl && rpcUrl !== CHAIN.rpc ? fallback([http(rpcUrl), http(CHAIN.rpc)]) : http(CHAIN.rpc);
+  const pub = createPublicClient({ chain: robinhood, transport });
+  const wallet = createWalletClient({ chain: robinhood, transport, account });
   return { account, pub, wallet };
 }
 

@@ -1,10 +1,10 @@
 // Commit Worker: static site, API (config, launches, activity, image uploads, GitHub proxy) and the keeper cron.
-import { createPublicClient, http, decodeFunctionData, decodeAbiParameters, decodeEventLog, verifyMessage, getAddress, isAddress } from "viem";
+import { createPublicClient, http, fallback, decodeFunctionData, decodeAbiParameters, decodeEventLog, verifyMessage, getAddress, isAddress } from "viem";
 import { CHAIN, PONS, PONS_FACTORY_ABI, REPO_RE } from "../chain.js";
 import { keeperTick, robinhood, FACTORY_ABI, clients, repoCommits } from "../keeper/core.js";
 
 // The public Robinhood RPC refuses Cloudflare: the Worker uses the private RPC_URL secret when it is set.
-const pub = (env) => createPublicClient({ chain: robinhood, transport: http(env?.RPC_URL || CHAIN.rpc) });
+const pub = (env) => createPublicClient({ chain: robinhood, transport: env?.RPC_URL ? fallback([http(env.RPC_URL), http(CHAIN.rpc)]) : http(CHAIN.rpc) });
 const J = (data, status = 200, extra = {}) => new Response(JSON.stringify(data, (k, v) => typeof v === "bigint" ? v.toString() : v), { status, headers: { "content-type": "application/json; charset=utf-8", "access-control-allow-origin": "*", ...extra } });
 const bad = (msg, status = 400) => J({ error: msg }, status);
 const lc = (a) => (a || "").toLowerCase();
@@ -103,10 +103,14 @@ async function registerLaunch(req, env) {
   if (!/^0x[0-9a-fA-F]{64}$/.test(tx || "") || !/^0x[0-9a-fA-F]{64}$/.test(nonce || "") || !REPO_RE.test(repo)) return bad("Bad launch data.");
   const config = await getConfig(env);
   if (!config?.factory) return bad("Commit is not configured yet.", 503);
-  const client = pub(env);
-  let receipt, txn;
-  try { [receipt, txn] = await Promise.all([client.getTransactionReceipt({ hash: tx }), client.getTransaction({ hash: tx })]); }
-  catch { return bad("Transaction not found yet. Try again in a few seconds.", 404); }
+  // try the private RPC, then the public one (one of them may lag, refuse or be out of quota)
+  const clients = [env.RPC_URL && createPublicClient({ chain: robinhood, transport: http(env.RPC_URL) }), createPublicClient({ chain: robinhood, transport: http(CHAIN.rpc) })].filter(Boolean);
+  let receipt, txn, client, why = "";
+  for (const c of clients) {
+    try { [receipt, txn] = await Promise.all([c.getTransactionReceipt({ hash: tx }), c.getTransaction({ hash: tx })]); client = c; break; }
+    catch (e) { why += (why ? " / " : "") + (e.shortMessage || e.message || "").split("\n")[0].slice(0, 120); }
+  }
+  if (!client) return bad(/not be found|not found/i.test(why) && !/HTTP|fetch|status|limit|unauthor/i.test(why) ? "Transaction not found yet. Try again in a few seconds." : "Could not read the launch transaction: " + why, 404);
   if (receipt.status !== "success") return bad("The launch transaction failed on-chain.");
   let p;
   if (lc(txn.to) === lc(PONS.factory)) p = decodeFunctionData({ abi: PONS_FACTORY_ABI, data: txn.input }).args[0];
